@@ -6,7 +6,7 @@ import pickle
 import style
 import pandas as pd
 
-with open('xgb_diabetics.best', 'rb') as file:
+with open('saved_model/xgb_diabetics.best', 'rb') as file:
     model = pickle.load(file)
 
 cols=['Age', 'Gender', 'Family_Diabetes', 'DelayedHealing',
@@ -49,19 +49,19 @@ personal_col=dbc.Col(
         html.H6("Personal Information",className='text-center'),
         html.Br(),
 
-        html.Label("Enter Age"),
+        html.Label("Enter Age*"),
         dbc.Input(type='number',id='age',value=27),
         html.Label(),
-        html.Label("Select Gender"),
+        html.Label("Select Gender*"),
         dcc.Dropdown(['Male','Female'],id='gender',value='Male'),
         html.Br(),
-        html.Label("Enter Height (cm)"),
+        html.Label("Enter Height (cm)*"),
         dbc.Input(type='number',id='height',value=180),
         html.Br(),
-        html.Label("Enter Weight (kg)"),
+        html.Label("Enter Weight (kg)*"),
         dbc.Input(type='number',id='weight',value=70),
         html.Br(),
-        html.Label("Family Diabetes"),
+        html.Label("Family Diabetes*"),
         dcc.Dropdown(options={'yes':'Yes','no':'No'},id='family',value='yes'),
         html.Br(),
 
@@ -75,16 +75,16 @@ habitual_col=dbc.Col(
         html.H6("Habitual Information"),
         html.Br(),
 
-        html.Label("Physical Activity"),
+        html.Label("Physical Activity*"),
         dcc.Dropdown(options=dict(zip(physical_act,physical_act_v)),id='phy',value='none'),
         html.Br(),
-        html.Label("Sleep Time (Hours)"),
+        html.Label("Sleep Time (Hours)*"),
         dbc.Input(type='number',id='sleep',value=8),
         html.Br(),
-        html.Label("Junk Food Consumption"),
+        html.Label("Junk Food Consumption*"),
         dcc.Dropdown(options=dict(zip(juck_food,juck_food_v)),id='junk',value='occasionally'),
         html.Br(),
-        html.Label("Smoking Habit"),
+        html.Label("Smoking Habit*"),
         dcc.Dropdown(options={'yes':'Yes','no':'No'},id='smoking',value='yes'),
         html.Br(),
 
@@ -97,19 +97,19 @@ other_col=dbc.Col(
         html.H6("Other Informations"),
         html.Br(),
 
-        html.Label("Stress"),
+        html.Label("Stress*"),
         dcc.Dropdown(options=dict(zip(stress,stress_v)),id='stress',value='always'),
         html.Br(),
-        html.Label("Blood Pressure"),
+        html.Label("Blood Pressure*"),
         dcc.Dropdown(options=dict(zip(bp,bp_v)),id='bp',value='normal'),
         html.Br(),
-        html.Label("Delayed Healing"),
+        html.Label("Delayed Healing*"),
         dcc.Dropdown(options={'yes':'Yes','no':'No'},id='heal',value='yes'),
         html.Br(),
-        html.Label("Urine Frequency"),
+        html.Label("Urine Frequency*"),
         dcc.Dropdown(options=dict(zip(urin,urin_v)),id='urin',value='quite often'),
         html.Br(),
-        html.Label("Regular Medicine"),
+        html.Label("Regular Medicine*"),
         dcc.Dropdown(options={'yes':'Yes','no':'No'},id='medicine',value='yes'),
         html.Br(),
 
@@ -174,26 +174,33 @@ layout = [top_row,drop_down_row]
     State('medicine','value'),
 
 )
-def out(n,gender,ages,h,w,family,phy,sleep,junk,smoke,stress,bp,heal,urin,med):
-    ages=45
+def out(n,gendera,ages,h,w,family,phy,sleepa,junk,smoke,stressa,bp,heal,urin,med):
+
+    if not all([gendera,ages,h,w,family,phy,sleepa,junk,smoke,stressa,bp,heal,urin,med]):
+        return [html.Br(),html.Br(),html.H4("Please Provide All Informaiton",style={'color':'darkred'}),html.Img(src='assets\warning.png',style=style.icon_img)]
+
+    # ages=45
     if (ages<40):
         age = 'less than 40'
-    if (ages<=40) & (ages<50):
+    if (ages>=40) & (ages<50):
         age = '40-59'
-    if (ages<=50) & (ages<60):
+    if (ages>=50) & (ages<60):
         age = '50-59'
     if (ages>=60):
         age = '60 or older'
-    gender = gender
+    print(bp)
+    if (h<50) or (w<20) or (sleepa<=0):
+        return [html.Br(),html.Br(),html.H4("Invalied Data Input",style={'color':'darkred'}),html.Img(src='assets\warning.png',style=style.icon_img)]
+    gender = gendera
     family_diabetes = family
     delayed_healing = heal
     physical_activity = phy
     bmi = w/((h/100))**2
     smoking = smoke
-    sleep = 4
+    sleep = sleepa
     regular_medicine = med
     junk_food = smoke
-    stress = stress
+    stress = stressa
     bplevel = bp
     urin_freq = urin
 
