@@ -50,19 +50,19 @@ personal_col=dbc.Col(
         html.Br(),
 
         html.Label("Enter Age*"),
-        dbc.Input(type='number',id='age',value=27),
+        dbc.Input(type='number',id='age'),
         html.Label(),
         html.Label("Select Gender*"),
-        dcc.Dropdown(['Male','Female'],id='gender',value='Male'),
+        dcc.Dropdown(['Male','Female'],id='gender'),
         html.Br(),
         html.Label("Enter Height (cm)*"),
-        dbc.Input(type='number',id='height',value=180),
+        dbc.Input(type='number',id='height'),
         html.Br(),
         html.Label("Enter Weight (kg)*"),
-        dbc.Input(type='number',id='weight',value=70),
+        dbc.Input(type='number',id='weight'),
         html.Br(),
         html.Label("Family Diabetes*"),
-        dcc.Dropdown(options={'yes':'Yes','no':'No'},id='family',value='yes'),
+        dcc.Dropdown(options={'yes':'Yes','no':'No'},id='family'),
         html.Br(),
 
 
@@ -76,16 +76,16 @@ habitual_col=dbc.Col(
         html.Br(),
 
         html.Label("Physical Activity*"),
-        dcc.Dropdown(options=dict(zip(physical_act,physical_act_v)),id='phy',value='none'),
+        dcc.Dropdown(options=dict(zip(physical_act,physical_act_v)),id='phy'),
         html.Br(),
         html.Label("Sleep Time (Hours)*"),
-        dbc.Input(type='number',id='sleep',value=8),
+        dbc.Input(type='number',id='sleep'),
         html.Br(),
         html.Label("Junk Food Consumption*"),
-        dcc.Dropdown(options=dict(zip(juck_food,juck_food_v)),id='junk',value='occasionally'),
+        dcc.Dropdown(options=dict(zip(juck_food,juck_food_v)),id='junk'),
         html.Br(),
         html.Label("Smoking Habit*"),
-        dcc.Dropdown(options={'yes':'Yes','no':'No'},id='smoking',value='yes'),
+        dcc.Dropdown(options={'yes':'Yes','no':'No'},id='smoking'),
         html.Br(),
 
 
@@ -98,19 +98,19 @@ other_col=dbc.Col(
         html.Br(),
 
         html.Label("Stress*"),
-        dcc.Dropdown(options=dict(zip(stress,stress_v)),id='stress',value='always'),
+        dcc.Dropdown(options=dict(zip(stress,stress_v)),id='stress'),
         html.Br(),
         html.Label("Blood Pressure*"),
-        dcc.Dropdown(options=dict(zip(bp,bp_v)),id='bp',value='normal'),
+        dcc.Dropdown(options=dict(zip(bp,bp_v)),id='bp'),
         html.Br(),
         html.Label("Delayed Healing*"),
-        dcc.Dropdown(options={'yes':'Yes','no':'No'},id='heal',value='yes'),
+        dcc.Dropdown(options={'yes':'Yes','no':'No'},id='heal'),
         html.Br(),
         html.Label("Urine Frequency*"),
-        dcc.Dropdown(options=dict(zip(urin,urin_v)),id='urin',value='quite often'),
+        dcc.Dropdown(options=dict(zip(urin,urin_v)),id='urin'),
         html.Br(),
         html.Label("Regular Medicine*"),
-        dcc.Dropdown(options={'yes':'Yes','no':'No'},id='medicine',value='yes'),
+        dcc.Dropdown(options={'yes':'Yes','no':'No'},id='medicine'),
         html.Br(),
 
 
@@ -176,97 +176,106 @@ layout = [top_row,drop_down_row]
 )
 def out(n,gendera,ages,h,w,family,phy,sleepa,junk,smoke,stressa,bp,heal,urin,med):
 
-    if not all([gendera,ages,h,w,family,phy,sleepa,junk,smoke,stressa,bp,heal,urin,med]):
-        return [html.Br(),html.Br(),html.H4("Please Provide All Informaiton",style={'color':'darkred'}),html.Img(src='assets\warning.png',style=style.icon_img)]
+    # if not all([gendera,ages,h,w,family,phy,sleepa,junk,smoke,stressa,bp,heal,urin,med]):
+    #     return [html.Br(),html.Br(),html.H4("Please Provide All Informaiton",style={'color':'darkred'}),html.Img(src='assets\warning.png',style=style.icon_img)]
+    try:
+        # ages=45
+        if (ages<40):
+            age = 'less than 40'
+        if (ages>=40) & (ages<50):
+            age = '40-59'
+        if (ages>=50) & (ages<60):
+            age = '50-59'
+        if (ages>=60):
+            age = '60 or older'
+        # print(bp)
+        if (h<50) or (w<20) or (sleepa<=0) or (sleepa>=22):
+            return [html.Br(),html.Br(),html.H4("Invalied Data Input",style={'color':'darkred'}),html.Img(src='assets\warning.png',style=style.icon_img)]
+        gender = gendera
+        family_diabetes = family
+        delayed_healing = heal
+        physical_activity = phy
+        bmi = w/((h/100))**2
+        smoking = smoke
+        sleep = sleepa
+        regular_medicine = med
+        junk_food = smoke
+        stress = stressa
+        bplevel = bp
+        urin_freq = urin
 
-    # ages=45
-    if (ages<40):
-        age = 'less than 40'
-    if (ages>=40) & (ages<50):
-        age = '40-59'
-    if (ages>=50) & (ages<60):
-        age = '50-59'
-    if (ages>=60):
-        age = '60 or older'
-    print(bp)
-    if (h<50) or (w<20) or (sleepa<=0):
-        return [html.Br(),html.Br(),html.H4("Invalied Data Input",style={'color':'darkred'}),html.Img(src='assets\warning.png',style=style.icon_img)]
-    gender = gendera
-    family_diabetes = family
-    delayed_healing = heal
-    physical_activity = phy
-    bmi = w/((h/100))**2
-    smoking = smoke
-    sleep = sleepa
-    regular_medicine = med
-    junk_food = smoke
-    stress = stressa
-    bplevel = bp
-    urin_freq = urin
+        def prediction_ready_data():
+            activity_f=['more than half an hr', 'none', 'one hr or more','x']
 
-    def prediction_ready_data():
-        activity_f=['more than half an hr', 'none', 'one hr or more','x']
+            stress_f=['not at all', 'sometimes','very often','x']
 
-        stress_f=['not at all', 'sometimes','very often','x']
+            bp_level_f=['low', 'normal','x']
 
-        bp_level_f=['low', 'normal','x']
+            junk_food_f = ['occasionally', 'often', 'very often','x']
 
-        junk_food_f = ['occasionally', 'often', 'very often','x']
+            age_f=['50-59','60 or older', 'less than 40','x']
 
-        age_f=['50-59','60 or older', 'less than 40','x']
+            predict_df=pd.DataFrame([[age,gender,family_diabetes,delayed_healing,physical_activity,bmi,smoking,sleep,regular_medicine,junk_food,stress,bplevel,urin_freq]],columns=cols)
+            def get_bin_encoder(d):
+                if (d=='yes') or (d=='not much') or (d=='Male'):
+                    return 1
+                if (d=='no') or (d=='quite often') or (d=='Female'):
+                    return 0
 
-        predict_df=pd.DataFrame([[age,gender,family_diabetes,delayed_healing,physical_activity,bmi,smoking,sleep,regular_medicine,junk_food,stress,bplevel,urin_freq]],columns=cols)
-        def get_bin_encoder(d):
-            if (d=='yes') or (d=='not much') or (d=='Male'):
-                return 1
-            if (d=='no') or (d=='quite often') or (d=='Female'):
-                return 0
+            fet=['Gender','Family_Diabetes','DelayedHealing','Smoking','RegularMedicine','UrinationFrequency']
 
-        fet=['Gender','Family_Diabetes','DelayedHealing','Smoking','RegularMedicine','UrinationFrequency']
+            def prep_data(data):
+                for feature in fet:
+                    data[feature]=data[feature].apply(get_bin_encoder)
 
-        def prep_data(data):
-            for feature in fet:
-                data[feature]=data[feature].apply(get_bin_encoder)
+                return data[fet]
 
-            return data[fet]
+            def get_predict_dummy(drop_down_cols,selected_fet):
+                dummy_df=pd.DataFrame(columns=drop_down_cols[:-1])
+                if selected_fet in drop_down_cols[:-1]:
+                    dummy_df[selected_fet]=[1]
+                    return dummy_df.fillna(0)
+                else:
+                    dummy_df[drop_down_cols[0]]=[0]
+                    return dummy_df.fillna(0)
+            bin_encoded=prep_data(predict_df)
+            fet_2=[activity_f,stress_f,bp_level_f,junk_food_f,age_f]
+            d_list=[]
+            for f,select in zip(fet_2,[physical_activity,junk_food,stress,bplevel,age]):
+                d_list.append(get_predict_dummy(f,select))
 
-        def get_predict_dummy(drop_down_cols,selected_fet):
-            dummy_df=pd.DataFrame(columns=drop_down_cols[:-1])
-            if selected_fet in drop_down_cols[:-1]:
-                dummy_df[selected_fet]=[1]
-                return dummy_df.fillna(0)
-            else:
-                dummy_df[drop_down_cols[0]]=[0]
-                return dummy_df.fillna(0)
-        bin_encoded=prep_data(predict_df)
-        fet_2=[activity_f,stress_f,bp_level_f,junk_food_f,age_f]
-        d_list=[]
-        for f,select in zip(fet_2,[physical_activity,junk_food,stress,bplevel,age]):
-            d_list.append(get_predict_dummy(f,select))
-
-        prediction_ready_df=pd.concat([predict_df[['BMI','Sleep']],d_list[0],d_list[1],d_list[2],d_list[3],d_list[4],bin_encoded],axis=1)
-        return prediction_ready_df
-    val=model.predict_proba(prediction_ready_data().values)
-    pred_val=model.predict(prediction_ready_data().values)[0]
+            prediction_ready_df=pd.concat([predict_df[['BMI','Sleep']],d_list[0],d_list[1],d_list[2],d_list[3],d_list[4],bin_encoded],axis=1)
+            return prediction_ready_df
+        val=model.predict_proba(prediction_ready_data().values)
+        pred_val=model.predict(prediction_ready_data().values)[0]
 
 
 
-    if pred_val==0:
-        out_string=[ html.H6(f'You Have {round(val[0][1]*100,2)}% Diabetes Risk',style={'color':'green'}),
-                    html.Br(),
-                    html.P(f'Maintain Your Current Lifestyle to Avoid Risk'),
-                    html.Img(src="assets/checked.png",style=style.icon_img)]
-    if pred_val==1:
-        out_string=[ html.H6(f'You Have {round(val[0][1]*100,2)}% Diabetes Risk',style={'color':'red'}),
-                    html.Br(),
-                    html.P(f'Click the Link Below To Know About Healthy Lifestyle'),
-                    
-                    
-                    dcc.Link('Healthy Living','/healthy-living'),
-                    html.Br(),
-                    html.Img(src="assets/cancel.png",style=style.icon_img),
-                    ]
-    if n==0:
-        return html.H4(f"")
-    else:
-        return out_string
+        if pred_val==0:
+            out_string=[ html.H6(f'You Have {round(val[0][1]*100,2)}% Diabetes Risk',style={'color':'green'}),
+                        html.Br(),
+                        html.P(f'Maintain Your Current Lifestyle to Avoid Risk'),
+                        html.Img(src="assets/checked.png",style=style.icon_img)]
+        if pred_val==1:
+            out_string=[ html.H6(f'You Have {round(val[0][1]*100,2)}% Diabetes Risk',style={'color':'red'}),
+                        html.Br(),
+                        html.P(f'Click the Link Below To Know About Healthy Lifestyle'),
+                        
+                        
+                        dcc.Link('Healthy Living','/healthy-living'),
+                        html.Br(),
+                        html.Img(src="assets/cancel.png",style=style.icon_img),
+                        ]
+        if n==0:
+            return html.H4(f"")
+        elif not all([gendera,ages,h,w,family,phy,sleepa,junk,smoke,stressa,bp,heal,urin,med]):
+            return [html.Br(),html.Br(),html.H4("Please Provide All Informaiton",style={'color':'darkred'}),html.Img(src='assets\warning.png',style=style.icon_img)]
+        else:
+            return out_string
+    
+    except:
+        if n==0:
+            return html.H4(f"")
+        elif not all([gendera,ages,h,w,family,phy,sleepa,junk,smoke,stressa,bp,heal,urin,med]):
+            return [html.Br(),html.Br(),html.H4("Please Provide All Informaiton",style={'color':'darkred'}),html.Img(src='assets\warning.png',style=style.icon_img)]
+
